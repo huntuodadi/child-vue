@@ -1,22 +1,14 @@
 <template>
   <div>
-      <router-link
-        to="/home"
-      >
-        home
-      </router-link>
-      <router-link
-        to="/about"
-      >
-        about
-      </router-link>
+    Home page
   </div>
 
 </template>
 
 <script>
+console.log('load home');
 export default {
-  name: 'HelloWorld',
+  name: 'Home',
   props: {
     msg: String
   }
