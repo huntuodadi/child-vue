@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>
+    <p>hello world</p>
+    <div id="shadow"></div>
+  </div>
+  <script>
+    // mode: close, 外界无法访问
+    let shadowDom = document.getElementById('shadow').attachShadow({mode: 'closed'});
+    let pEle = document.createElement('p');
+    pEle.innerHTML = 'hello zzy'
+
+    let styleEle = document.createElement('style');
+    styleEle.textContent = 'p{color: red}';
+    shadowDom.appendChild(styleEle);
+    shadowDom.appendChild(pEle);
+  </script>
+</body>
+</html>
