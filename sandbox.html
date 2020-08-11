@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    // 如果应用加载刚开始我家在A应用 挂在了window.a 切换到B应用时a属性还在
+    // 沙箱机制 创造一个干净的环境给这个子应用使用 切换应用时选择丢弃A上挂载的属性
+
+    // 沙箱的种类
+    // 1. 快照沙箱  1年前拍一张 再拍一张 将差别保存 再回到一年前
+    class SnapshotSandbox {
+      constructor() {
+        this.proxy = window;
+        this.modifyProps ={}; // 记录在window上的修改
+        this.active();
+      }
+
+      active() {
+        this.windowSnapshot = {}; // 把window拍照
+        for(const prop in window) {
+          if(window.hasOwnPropperty(prop)) {
+            this.windowSnapshot[prop] = window[prop]
+          }
+        }
+        Object.keys(this.modifyProps).forEach(prop => {
+          window[prop] = this.modifyProps[prop];
+        })
+      }
+
+      inactive() {
+        for(const prop in window) {
+          if(window.hasOwnPropperty(prop)) {
+            if(window[prop] !== this.windowSnapshot[prop]) {
+              this.modifyProps[prop] = window[prop];
+              window[prop] = this.windowSnapshot[prop];
+            }
+          }
+        }
+      }
+    }
+    let sandbox = new SnapshotSandbox();
+    (() => {
+
+    })(sandbox.proxy) // 这里的proxy就是window
+  </script>
+</body>
+</html>
