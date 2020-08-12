@@ -13,8 +13,8 @@
     // 沙箱的种类
     // 1. 快照沙箱  1年前拍一张 再拍一张 将差别保存 再回到一年前
     class SnapshotSandbox {
-      constructor() {
-        this.proxy = window;
+      constructor(shotTarget) {
+        this.proxy = shotTarget;
         this.modifyProps ={}; // 记录在window上的修改
         this.active();
       }
@@ -22,30 +22,46 @@
       active() {
         this.windowSnapshot = {}; // 把window拍照
         for(const prop in window) {
-          if(window.hasOwnPropperty(prop)) {
-            this.windowSnapshot[prop] = window[prop]
+          if(this.proxy.hasOwnProperty(prop)) {
+            this.windowSnapshot[prop] = this.proxy[prop]
           }
         }
         Object.keys(this.modifyProps).forEach(prop => {
-          window[prop] = this.modifyProps[prop];
+          this.proxy[prop] = this.modifyProps[prop];
         })
       }
 
       inactive() {
-        for(const prop in window) {
-          if(window.hasOwnPropperty(prop)) {
-            if(window[prop] !== this.windowSnapshot[prop]) {
-              this.modifyProps[prop] = window[prop];
-              window[prop] = this.windowSnapshot[prop];
+        for(const prop in this.proxy) {
+          if(this.proxy.hasOwnProperty(prop)) {
+            if(this.proxy[prop] !== this.windowSnapshot[prop]) {
+              this.modifyProps[prop] = this.proxy[prop];
+              this.proxy[prop] = this.windowSnapshot[prop];
             }
           }
         }
       }
     }
-    let sandbox = new SnapshotSandbox();
-    (() => {
-
+    let sandbox = new SnapshotSandbox(window);
+    ((__window) => {
+      __window.a = 1;
+      __window.b = 2;
+      let entity = {
+        name: 'zzy',
+        id: 1,
+      }
+      __window.obj = {
+        entity,
+      }
+      console.log(__window.obj);
+      sandbox.inactive();
+      entity.name = 'aaa'
+      console.log(__window.obj);
+      sandbox.active();
+      console.log(__window.obj);
     })(sandbox.proxy) // 这里的proxy就是window
+
+    // 如果是多个子应用就不能用这种方式, 用es6 proxy
   </script>
 </body>
 </html>
